@@ -15,6 +15,7 @@ import { addProject, getUserProjects, Project } from "@/lib/firestore"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { PROJECT_TEMPLATES, ProjectTemplateKey } from "@/lib/constants"
+import { CopyLinkButton } from "@/components/copy-link-button"
 
 export default function DashboardPage({
   onNavigate,
@@ -70,7 +71,7 @@ export default function DashboardPage({
       await addProject({
         ...newProject,
         timeline: templateMilestones
-      }, user.uid)
+      }, user.uid, user.email)
       
       toast.success("Project created successfully")
       
@@ -186,16 +187,7 @@ export default function DashboardPage({
                       >
                         <Edit2 className="w-4 h-4" />
                       </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          // Copy logic here
-                        }}
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
+                      <CopyLinkButton slug={project.slug} variant="ghost" size="sm" />
                       <Button
                         variant="ghost"
                         size="sm"

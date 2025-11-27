@@ -4,8 +4,9 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, Send, CheckCircle2, Loader2 } from "lucide-react"
+import { ArrowLeft, Send, CheckCircle2, Loader2, ExternalLink } from "lucide-react"
 import { getProjectBySlug, addFeedback, Project } from "@/lib/firestore"
+import { sendFeedbackEmail } from "@/app/actions/email"
 import { toast } from "sonner"
 
 export default function ClientViewPage() {
@@ -47,7 +48,20 @@ export default function ClientViewPage() {
     try {
       setSendingFeedback(true)
       await addFeedback(project.id, feedback)
-      toast.success("Message sent to the developer!")
+      
+      if (project.ownerEmail) {
+        const result = await sendFeedbackEmail(
+          project.ownerEmail,
+          project.client,
+          feedback,
+          project.title
+        )
+        if (!result.success) {
+          console.error("Failed to send email notification:", result.error)
+        }
+      }
+
+      toast.success("Feedback sent & Developer notified!")
       setFeedback("")
     } catch (error) {
       console.error("Error sending feedback:", error)
@@ -151,6 +165,19 @@ export default function ClientViewPage() {
                 <span className="text-xs font-medium text-accent">Live</span>
               </div>
             </div>
+            
+            {project.liveLink && (
+              <div className="mt-6 pt-6 border-t border-primary/10">
+                <Button 
+                  variant="outline" 
+                  className="w-full gap-2 bg-background/50 hover:bg-background/80"
+                  onClick={() => window.open(project.liveLink, '_blank')}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  View Live Site
+                </Button>
+              </div>
+            )}
           </Card>
         )}
 

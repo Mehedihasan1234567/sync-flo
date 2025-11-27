@@ -14,6 +14,7 @@ import { nanoid } from "nanoid";
 export interface Project {
   id: string;
   ownerId: string;
+  ownerEmail?: string;
   title: string;
   client: string;
   slug: string;
@@ -22,18 +23,21 @@ export interface Project {
   status: "active" | "completed" | "archived";
   createdAt: Timestamp;
   currentFocus?: string;
+  liveLink?: string;
   timeline?: { id: number; name: string; completed: boolean }[];
 }
 
 export const addProject = async (
   data: { client: string; project: string; date?: Date; timeline?: { id: number; name: string; completed: boolean }[] }, 
-  userId: string
+  userId: string,
+  ownerEmail: string | null | undefined
 ) => {
   try {
     const slug = `${data.project.toLowerCase().replace(/\s+/g, '-')}-${nanoid(6)}`;
     
     const docRef = await addDoc(collection(db, "projects"), {
       ownerId: userId,
+      ownerEmail: ownerEmail || "",
       title: data.project,
       client: data.client,
       slug: slug,

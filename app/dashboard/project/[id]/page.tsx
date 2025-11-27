@@ -19,6 +19,7 @@ import {
   MessageSquare,
   Check
 } from "lucide-react"
+import { CopyLinkButton } from "@/components/copy-link-button"
 import { toast } from "sonner"
 import { db } from "@/lib/firebase"
 import { doc, onSnapshot, updateDoc, collection, query, orderBy, Timestamp } from "firebase/firestore"
@@ -237,6 +238,7 @@ export default function ProjectEditorPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+             <CopyLinkButton slug={project.slug} showLabel />
              <Button variant="outline" size="sm" onClick={() => router.push(`/p/${project.slug}`)}>
                 View Client Page
              </Button>
