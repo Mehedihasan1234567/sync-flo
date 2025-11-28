@@ -25,8 +25,9 @@ export default function DashboardPage({
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
   const [isLoadingProjects, setIsLoadingProjects] = useState(true)
-  const [newProject, setNewProject] = useState<{ client: string; project: string; date: Date | undefined; template: ProjectTemplateKey }>({ 
+  const [newProject, setNewProject] = useState<{ client: string; clientEmail: string; project: string; date: Date | undefined; template: ProjectTemplateKey }>({ 
     client: "", 
+    clientEmail: "",
     project: "", 
     date: undefined,
     template: 'blank'
@@ -79,7 +80,7 @@ export default function DashboardPage({
       const userProjects = await getUserProjects(user.uid)
       setProjects(userProjects)
       
-      setNewProject({ client: "", project: "", date: undefined, template: 'blank' })
+      setNewProject({ client: "", clientEmail: "", project: "", date: undefined, template: 'blank' })
       setIsCreateModalOpen(false)
     } catch (error) {
       console.error("Failed to create project", error)
@@ -238,6 +239,15 @@ export default function DashboardPage({
                 placeholder="e.g. Acme Corp"
                 value={newProject.client}
                 onChange={(e) => setNewProject({ ...newProject, client: e.target.value })}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="clientEmail">Client Email (Optional)</Label>
+              <Input
+                id="clientEmail"
+                placeholder="client@example.com"
+                value={newProject.clientEmail}
+                onChange={(e) => setNewProject({ ...newProject, clientEmail: e.target.value })}
               />
             </div>
             <div className="grid gap-2">

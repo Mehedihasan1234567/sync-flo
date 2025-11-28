@@ -1,48 +1,62 @@
 "use server";
 
 import { Resend } from "resend";
+import WelcomeEmail from "@/emails/WelcomeEmail";
+import ClientUpdateEmail from "@/emails/ClientUpdateEmail";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const sendFeedbackEmail = async (
-  toEmail: string,
-  clientName: string,
-  message: string,
-  projectTitle: string
-) => {
-  if (!process.env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY is missing");
-    return { success: false, error: "Server configuration error" };
-  }
-
+export async function sendWelcomeEmail(email: string, name: string) {
   try {
     const { data, error } = await resend.emails.send({
-      from: "onboarding@resend.dev",
-      to: toEmail,
-      subject: `New Feedback from ${clientName}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>New Feedback Received!</h2>
-          <p><strong>Project:</strong> ${projectTitle}</p>
-          <p><strong>Client:</strong> ${clientName}</p>
-          <div style="background-color: #f4f4f5; padding: 16px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0;">${message}</p>
-          </div>
-          <p style="color: #666; font-size: 14px;">
-            Log in to your dashboard to view more details.
-          </p>
-        </div>
-      `,
+      from: "SyncFlow <onboarding@resend.dev>",
+      to: [email],
+      subject: "Welcome to SyncFlow! 🚀",
+      react: WelcomeEmail({ name }),
     });
 
     if (error) {
-      console.error("Resend error:", error);
-      return { success: false, error: error.message };
+      console.error("Error sending welcome email:", error);
+      return { success: false, error };
     }
 
     return { success: true, data };
   } catch (error) {
-    console.error("Failed to send email:", error);
-    return { success: false, error: "Failed to send email" };
+    console.error("Exception sending welcome email:", error);
+    return { success: false, error };
   }
-};
+}
+
+export async function sendClientUpdateEmail(
+  clientEmail: string,
+  clientName: string,
+  projectName: string,
+  progress: number,
+  currentTask: string,
+  projectSlug: string
+) {
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "SyncFlow <updates@resend.dev>",
+      to: [clientEmail],
+      subject: `Project Update: ${projectName} is ${progress}% Complete`,
+      react: ClientUpdateEmail({
+        clientName,
+        projectName,
+        progress,
+        currentTask,
+        projectSlug,
+      }),
+    });
+
+    if (error) {
+      console.error("Error sending client update email:", error);
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Exception sending client update email:", error);
+    return { success: false, error };
+  }
+}

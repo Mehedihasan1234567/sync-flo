@@ -23,6 +23,7 @@ import { CopyLinkButton } from "@/components/copy-link-button"
 import { toast } from "sonner"
 import { db } from "@/lib/firebase"
 import { doc, onSnapshot, updateDoc, collection, query, orderBy, Timestamp } from "firebase/firestore"
+import { sendClientUpdateEmail } from "@/app/actions/email"
 
 interface Milestone {
   id: number
@@ -33,6 +34,7 @@ interface Milestone {
 interface ProjectData {
   name: string
   clientName: string
+  clientEmail?: string
   progress: number
   currentFocus: string
   liveLink: string
@@ -121,7 +123,21 @@ export default function ProjectEditorPage() {
         liveLink,
         status
       })
-      toast.success("Update saved!")
+      
+      // Send Client Update Email if clientEmail exists
+      if (project.clientEmail) {
+        await sendClientUpdateEmail(
+          project.clientEmail,
+          project.clientName,
+          project.name,
+          progress,
+          currentFocus,
+          project.slug
+        );
+        toast.success("Update saved & Client notified via email! 📧")
+      } else {
+        toast.success("Update saved!")
+      }
     } catch (error) {
       console.error("Error saving update:", error)
       toast.error("Failed to save update")

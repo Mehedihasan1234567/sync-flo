@@ -17,6 +17,7 @@ export interface Project {
   ownerEmail?: string;
   title: string;
   client: string;
+  clientEmail?: string;
   slug: string;
   dueDate?: Timestamp;
   progress: number;
@@ -28,7 +29,7 @@ export interface Project {
 }
 
 export const addProject = async (
-  data: { client: string; project: string; date?: Date; timeline?: { id: number; name: string; completed: boolean }[] }, 
+  data: { client: string; clientEmail?: string; project: string; date?: Date; timeline?: { id: number; name: string; completed: boolean }[] }, 
   userId: string,
   ownerEmail: string | null | undefined
 ) => {
@@ -40,6 +41,7 @@ export const addProject = async (
       ownerEmail: ownerEmail || "",
       title: data.project,
       client: data.client,
+      clientEmail: data.clientEmail || "",
       slug: slug,
       dueDate: data.date ? Timestamp.fromDate(data.date) : null,
       progress: 0,
