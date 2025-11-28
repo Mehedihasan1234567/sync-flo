@@ -35,7 +35,7 @@ export const ClientUpdateEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>Project Update: {projectName} is {progress}% Complete</Preview>
+      <Preview>{`Project Update: ${projectName} is ${progress}% Complete`}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Heading style={h1}>Project Update 🚀</Heading>
